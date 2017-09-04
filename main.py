@@ -5,6 +5,7 @@ import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
 
+regularization_paramater = 1e-3
 
 # Check TensorFlow Version
 assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
@@ -59,7 +60,31 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    return None
+
+    vgg_layer7_out_conv1x1 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, strides=(1,1), padding='same',
+                                              kernel_regularizer=tf.contrib.layers.l2_regularizer(regularization_paramater))
+
+    vgg_layer4_out_conv1x1 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, strides=(1,1), padding='same',
+                                              kernel_regularizer=tf.contrib.layers.l2_regularizer(regularization_paramater))
+
+    vgg_layer3_out_conv1x1 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, strides=(1,1), padding='same',
+                                              kernel_regularizer=tf.contrib.layers.l2_regularizer(regularization_paramater))
+
+    upsample_vgg_layer7 = tf.layers.conv2d_transpose(vgg_layer7_out_conv1x1, num_classes, 4, strides=(2,2), padding='same',
+                                                     kernel_regularizer=tf.contrib.layers.l2_regularizer(regularization_paramater))
+
+    skip_layer_7and4 = tf.add(upsample_vgg_layer7, vgg_layer4_out_conv1x1)
+
+
+    upsample_layer4 = tf.layers.conv2d_transpose(skip_layer_7and4, num_classes, 4, strides=(2,2), padding='same',
+                                                     kernel_regularizer=tf.contrib.layers.l2_regularizer(regularization_paramater))
+
+    skip_layer_4and3 = tf.add(upsample_layer4, vgg_layer3_out_conv1x1)
+
+    upsample_layer3 = tf.layers.conv2d_transpose(skip_layer_4and3, num_classes, 16, strides=(8,8), padding='same',
+                                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(regularization_paramater))
+    return upsample_layer3
+
 tests.test_layers(layers)
 
 
