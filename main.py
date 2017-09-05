@@ -147,8 +147,8 @@ def run():
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
 
-    epochs = 12
-    batch_size = 25
+    epochs = 25
+    batch_size = 30
 
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
