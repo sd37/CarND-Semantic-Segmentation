@@ -125,12 +125,17 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     """
     # TODO: Implement function
 
+    print("Training Start ...")
+
     for epoch in range(epochs):
+        print('epoch = {}', epoch)
         for images, labels in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
                                feed_dict={input_image: images, correct_label: labels, keep_prob: 0.5, learning_rate: 0.005})
 
         print("training_loss: {:.2f}, current status = {}/{} epochs".format(loss, epoch, epochs))
+
+    print("Training End ...")
 
 tests.test_train_nn(train_nn)
 

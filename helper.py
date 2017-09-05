@@ -54,6 +54,8 @@ def maybe_download_pretrained_vgg(data_dir):
         zip_ref.extractall(data_dir)
         zip_ref.close()
 
+        print('Extracting model... finished')
+
         # Remove zip file to save space
         os.remove(os.path.join(vgg_path, vgg_filename))
 
